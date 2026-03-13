@@ -4,288 +4,286 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>הצעת מחיר - אברהם פרסום בעמ</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Frank+Ruhl+Libre:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  :root {
-    --bg: #f0f2f5;
-    --card: #ffffff;
-    --text: #1a1a2e;
-    --text-secondary: #555;
-    --text-muted: #888;
-    --border: #e0e0e0;
-    --accent: #2d3a8c;
-    --accent-light: #3b4cca;
-    --total-color: #1a6b3c;
-    --danger: #c0392b;
-    --success: #27ae60;
-    --radius: 0;
-    --shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-
-  html { font-size: 15px; }
-
   body {
-    font-family: 'Assistant', 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
   }
 
   .page-wrapper {
-    max-width: 820px;
+    max-width: 800px;
     margin: 0 auto;
-    padding: 24px 16px 60px;
+    padding: 32px 16px 60px;
   }
 
-  /* ── Status Banner ── */
-  .status-banner {
+  /* ── Loading & Error States ── */
+  .loading-state {
     text-align: center;
-    padding: 10px 20px;
+    padding: 100px 20px;
+  }
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-state p {
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+
+  .error-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .error-state .error-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+
+  .error-state h2 {
+    font-size: 1.3rem;
     font-weight: 600;
-    font-size: 0.9rem;
-    letter-spacing: 0.02em;
-    border-radius: 6px 6px 0 0;
+    margin-bottom: 8px;
+    color: #1e293b;
   }
-  .status-banner.pending {
-    background: #fff3cd;
-    color: #856404;
-    border-bottom: 2px solid #ffc107;
-  }
-  .status-banner.approved {
-    background: #d4edda;
-    color: #155724;
-    border-bottom: 2px solid #28a745;
+
+  .error-state p {
+    color: #64748b;
+    font-size: 0.95rem;
   }
 
   /* ── Card ── */
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    margin-bottom: 0;
-  }
-
-  .quote-document {
-    background: var(--card);
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    border-radius: 6px;
+  .quote-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
     overflow: hidden;
   }
 
-  .document-inner {
-    padding: 40px 48px;
+  .card-inner {
+    padding: 40px 44px;
   }
 
   @media (max-width: 600px) {
-    .document-inner { padding: 24px 20px; }
+    .card-inner { padding: 24px 18px; }
+    .page-wrapper { padding: 16px 10px 40px; }
   }
 
-  /* ── Header ── */
+  /* ── Header / Logo + Title ── */
   .quote-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 36px;
+    text-align: center;
+    margin-bottom: 32px;
     padding-bottom: 28px;
-    border-bottom: 2px solid var(--text);
+    border-bottom: 1px solid #e2e8f0;
   }
 
   .company-logo {
     width: 72px;
-    height: 72px;
-    background: var(--text);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Frank Ruhl Libre', serif;
-    font-size: 2.4rem;
-    font-weight: 900;
-    letter-spacing: -1px;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
-
-  .quote-title-block {
-    text-align: center;
-    flex: 1;
-    padding: 0 24px;
+    height: auto;
+    margin: 0 auto 16px;
+    display: block;
   }
 
   .quote-title {
-    font-family: 'Frank Ruhl Libre', serif;
-    font-size: 2.2rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    color: var(--text);
-    margin-bottom: 0;
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: .35em;
+    color: #1e293b;
+    margin-bottom: 6px;
   }
 
-  .header-left-space {
-    width: 72px;
-    flex-shrink: 0;
+  .quote-subtitle {
+    font-size: 0.95rem;
+    color: #64748b;
+    font-weight: 400;
   }
 
-  /* ── Meta Info ── */
-  .quote-meta {
+  /* ── Info Grid (4 blocks) ── */
+  .info-grid {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    justify-content: center;
+    gap: 32px;
     margin-bottom: 32px;
-    gap: 20px;
+    flex-wrap: wrap;
   }
 
-  .meta-right, .meta-left {
-    font-size: 0.93rem;
-    line-height: 1.8;
+  .info-block {
+    text-align: center;
+    min-width: 100px;
   }
 
-  .meta-label {
+  .info-block .info-label {
+    display: block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .info-block .info-value {
+    font-size: 0.95rem;
     font-weight: 600;
-    color: var(--text);
+    color: #1e293b;
   }
 
-  .meta-value {
-    color: var(--text);
+  /* ── Subject / Intro ── */
+  .quote-subject-line {
+    text-align: center;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: #475569;
   }
 
-  /* ── Subject ── */
-  .quote-subject {
-    margin-bottom: 16px;
-    font-size: 1rem;
+  .quote-subject-line strong {
+    color: #1e293b;
+  }
+
+  .quote-intro-text {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 28px;
     line-height: 1.7;
   }
 
-  .subject-line {
-    font-weight: 700;
-    font-size: 1.05rem;
-  }
-
-  .quote-intro {
-    margin-bottom: 8px;
-    color: var(--text-secondary);
-    font-size: 0.93rem;
-  }
-
-  .quote-scope {
-    color: var(--text-secondary);
-    font-size: 0.93rem;
-    margin-bottom: 28px;
-  }
-
-  /* ── Table ── */
+  /* ── Items Table ── */
   .items-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   .items-table thead th {
-    background: #f8f9fa;
-    padding: 10px 16px;
-    font-weight: 700;
+    background: #f8fafc;
+    padding: 10px 14px;
+    font-weight: 600;
     text-align: right;
-    border-top: 2px solid var(--text);
-    border-bottom: 1px solid var(--border);
-    font-size: 0.88rem;
-    color: var(--text);
+    border-top: 2px solid #2563eb;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.82rem;
+    color: #475569;
+    letter-spacing: 0.02em;
+  }
+
+  .items-table thead th.col-num {
+    text-align: center;
+    width: 44px;
+  }
+
+  .items-table thead th.col-bruto,
+  .items-table thead th.col-neto {
+    text-align: left;
+    width: 110px;
   }
 
   .items-table tbody td {
-    padding: 11px 16px;
-    border-bottom: 1px solid #eee;
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
   }
 
-  .items-table tbody tr:last-child td {
-    border-bottom: 2px solid var(--text);
+  .items-table tbody td.col-num {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.85rem;
   }
 
-  .items-table .col-description { text-align: right; }
-  .items-table .col-qty { text-align: center; width: 80px; }
-  .items-table .col-price { text-align: left; width: 120px; }
+  .items-table tbody td.col-bruto,
+  .items-table tbody td.col-neto {
+    text-align: left;
+    direction: ltr;
+    font-weight: 500;
+  }
 
+  .items-table tbody td.col-bruto {
+    color: #94a3b8;
+    text-decoration: line-through;
+  }
+
+  .items-table tbody tr:last-child td {
+    border-bottom: 2px solid #2563eb;
+  }
+
+  /* ── Total Row ── */
   .total-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
+    padding: 14px;
     font-weight: 700;
-    font-size: 1.05rem;
-    background: #fafafa;
-    border-bottom: 2px solid var(--text);
+    font-size: 1rem;
+    background: #f8fafc;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .total-label {
+    color: #1e293b;
   }
 
   .total-amount {
-    color: var(--accent-light);
-    font-size: 1.15rem;
-    font-weight: 800;
+    color: #2563eb;
+    font-size: 1.1rem;
+    font-weight: 700;
     direction: ltr;
   }
 
-  /* ── Sections ── */
+  /* ── Section Blocks ── */
   .section-block {
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
   }
 
   .section-title {
-    font-family: 'Frank Ruhl Libre', serif;
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-size: 0.95rem;
+    font-weight: 600;
     text-align: center;
-    margin-bottom: 14px;
-    color: var(--text);
+    margin-bottom: 10px;
+    color: #1e293b;
   }
 
   .section-text {
     text-align: center;
-    font-size: 0.93rem;
-    color: var(--text-secondary);
+    font-size: 0.9rem;
+    color: #64748b;
     line-height: 1.7;
-  }
-
-  /* ── Bank Details ── */
-  .bank-details {
-    text-align: center;
-    font-size: 0.93rem;
-    color: var(--text-secondary);
-  }
-
-  .bank-details .detail-line {
-    direction: rtl;
   }
 
   /* ── Signature Section ── */
   .signature-section {
-    margin-top: 32px;
-    padding-top: 28px;
-    border-top: 1px solid var(--border);
-  }
-
-  .signature-section .section-title {
-    margin-bottom: 20px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
   }
 
   .sig-field-group {
-    max-width: 440px;
+    max-width: 420px;
     margin: 0 auto;
   }
 
   .sig-label {
     display: block;
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: #64748b;
     text-align: center;
     margin-bottom: 6px;
   }
@@ -293,35 +291,35 @@
   .sig-input {
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid var(--border);
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
-    font-family: 'Assistant', sans-serif;
-    font-size: 1rem;
+    font-family: inherit;
+    font-size: 0.95rem;
     text-align: center;
     outline: none;
     transition: border-color 0.2s;
-    background: #fafafa;
-    color: var(--text);
-    margin-bottom: 16px;
+    background: #f8fafc;
+    color: #1e293b;
+    margin-bottom: 14px;
   }
 
   .sig-input:focus {
-    border-color: var(--accent);
-    background: white;
+    border-color: #2563eb;
+    background: #fff;
   }
 
   .canvas-wrapper {
     position: relative;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   #signatureCanvas {
     width: 100%;
-    height: 160px;
-    border: 1px solid var(--border);
+    height: 150px;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     cursor: crosshair;
-    background: white;
+    background: #fff;
     touch-action: none;
     display: block;
   }
@@ -331,8 +329,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #ccc;
-    font-size: 0.9rem;
+    color: #cbd5e1;
+    font-size: 0.85rem;
     pointer-events: none;
     transition: opacity 0.3s;
   }
@@ -341,62 +339,107 @@
 
   .sig-buttons {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 16px;
   }
 
   .btn {
-    padding: 11px 32px;
+    padding: 10px 28px;
     border: none;
     border-radius: 8px;
-    font-family: 'Assistant', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 700;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    letter-spacing: 0.02em;
   }
 
   .btn-primary {
-    background: var(--accent);
-    color: white;
+    background: #2563eb;
+    color: #fff;
   }
-  .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:hover { background: #1d4ed8; }
   .btn-primary:disabled {
-    background: #aaa;
+    background: #94a3b8;
     cursor: not-allowed;
-    transform: none;
   }
 
   .btn-secondary {
-    background: #f0f0f0;
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
   }
-  .btn-secondary:hover { background: #e4e4e4; }
+  .btn-secondary:hover { background: #e2e8f0; }
+
+  /* ── Bank Details ── */
+  .bank-details {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+
+  .bank-details strong {
+    color: #1e293b;
+  }
 
   /* ── Footer ── */
   .quote-footer {
-    margin-top: 36px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-    text-align: left;
-    font-size: 0.93rem;
-    line-height: 1.8;
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
   }
 
-  .footer-greeting { color: var(--text-secondary); }
-  .footer-name { font-weight: 700; color: var(--text); }
-  .footer-company { font-weight: 600; color: var(--text); }
+  .footer-greeting {
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+
+  .footer-name {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.95rem;
+  }
+
+  .footer-company {
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+
+  .footer-copy {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-top: 10px;
+  }
+
+  /* ── Status Banner ── */
+  .status-banner {
+    text-align: center;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .status-banner.pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-banner.approved {
+    background: #d1fae5;
+    color: #065f46;
+  }
 
   /* ── Approval Overlay ── */
   .approval-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.45);
     z-index: 100;
     align-items: center;
     justify-content: center;
@@ -406,174 +449,179 @@
   .approval-overlay.active { display: flex; }
 
   .approval-card {
-    background: white;
+    background: #fff;
     border-radius: 16px;
-    padding: 40px;
+    padding: 36px;
     text-align: center;
-    max-width: 400px;
+    max-width: 380px;
     width: 90%;
     box-shadow: 0 20px 60px rgba(0,0,0,0.15);
   }
 
   .approval-icon {
-    width: 64px;
-    height: 64px;
-    background: #d4edda;
+    width: 56px;
+    height: 56px;
+    background: #d1fae5;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 2rem;
+    margin: 0 auto 14px;
+    font-size: 1.6rem;
+    color: #065f46;
   }
 
   .approval-card h3 {
-    font-family: 'Frank Ruhl Libre', serif;
-    font-size: 1.4rem;
-    margin-bottom: 8px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #1e293b;
   }
 
   .approval-card p {
-    color: var(--text-secondary);
-    font-size: 0.93rem;
-    margin-bottom: 20px;
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 18px;
   }
-
-  /* ── Loading State ── */
-  .loading-state {
-    text-align: center;
-    padding: 80px 20px;
-  }
-
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ── Print ── */
   @media print {
-    body { background: white; }
+    body { background: #fff; }
     .page-wrapper { padding: 0; max-width: 100%; }
     .status-banner, .signature-section, .sig-buttons { display: none; }
-    .quote-document { box-shadow: none; border: none; }
+    .quote-card { box-shadow: none; border-radius: 0; }
   }
 </style>
 </head>
 <body>
 
 <div class="page-wrapper">
-  <!-- Status Banner -->
-  <div class="status-banner pending" id="statusBanner">
-    ממתין לאישור הלקוח
+
+  <!-- Loading State -->
+  <div class="loading-state" id="loadingState">
+    <div class="spinner"></div>
+    <p>טוען הצעת מחיר...</p>
   </div>
 
-  <div class="quote-document">
-    <div class="document-inner">
+  <!-- Error State -->
+  <div class="error-state" id="errorState" style="display:none;">
+    <div class="error-icon">&#9888;&#65039;</div>
+    <h2>שגיאה</h2>
+    <p id="errorMessage">הצעת מחיר לא נמצאה</p>
+  </div>
 
-      <!-- Header -->
-      <div class="quote-header">
-        <div class="company-logo">A.</div>
-        <div class="quote-title-block">
-          <h1 class="quote-title">ה צ ע ת&nbsp;&nbsp;מ ח י ר</h1>
+  <!-- Quote Content (hidden until loaded) -->
+  <div id="quoteContent" style="display:none;">
+
+    <!-- Status Banner -->
+    <div class="status-banner pending" id="statusBanner">
+      ממתין לאישור הלקוח
+    </div>
+
+    <div class="quote-card">
+      <div class="card-inner">
+
+        <!-- Header: Logo + Title -->
+        <div class="quote-header">
+          <img src="https://base44.app/api/apps/699c51009912f4002ab9900b/files/public/699c51009912f4002ab9900b/2fd5bcf68_.png"
+               alt="אברהם פרסום" class="company-logo" id="companyLogo">
+          <h1 class="quote-title">הצעת מחיר</h1>
+          <div class="quote-subtitle" id="quoteSubtitle"></div>
         </div>
-        <div class="header-left-space"></div>
-      </div>
 
-      <!-- Meta -->
-      <div class="quote-meta">
-        <div class="meta-right">
-          <div><span class="meta-label">לכבוד:</span> <span class="meta-value" id="customerName">אמיגה גרופ</span></div>
-          <div><span class="meta-value" id="contactName">הנרי אמיגה</span></div>
-          <div><span class="meta-value" id="contactPhone">052-9288485</span></div>
-        </div>
-        <div class="meta-left">
-          <div><span class="meta-label">מספר הצעה:</span> <span class="meta-value" id="quoteNumber">00011</span></div>
-          <div><span class="meta-label">תאריך:</span> <span class="meta-value" id="quoteDate">13.3.2026</span></div>
-        </div>
-      </div>
-
-      <!-- Subject -->
-      <div class="quote-subject">
-        <div><span class="meta-label">הנדון:</span> <span class="subject-line" id="quoteSubject">פסח 2026</span></div>
-      </div>
-
-      <p class="quote-intro" id="introText">היי הנרי אמיגה</p>
-      <p class="quote-scope">בהמשך לשיחתנו, להלן הצעת המחיר לביצוע העבודה כמפורט מטה.</p>
-      <p class="quote-scope">ההצעה כוללת את השירותים/תוצרים שסוכמו, בהתאם לדרישות הפרויקט ולוחות הזמנים שתואמו.</p>
-
-      <!-- Items Table -->
-      <table class="items-table">
-        <thead>
-          <tr>
-            <th class="col-description">תיאור</th>
-            <th class="col-qty">כמות</th>
-            <th class="col-price">מחיר נטו</th>
-          </tr>
-        </thead>
-        <tbody id="itemsBody">
-          <!-- Populated by JS -->
-        </tbody>
-      </table>
-
-      <!-- Total -->
-      <div class="total-row">
-        <span>סה"כ לפני מע"מ</span>
-        <span class="total-amount" id="totalAmount">₪8,400</span>
-      </div>
-
-      <!-- Payment Terms -->
-      <div class="section-block">
-        <h3 class="section-title">תנאי תשלום</h3>
-        <div class="section-text">
-          <p>בהתאם למוסכם עמכם,</p>
-          <p>תנאי התשלום הם <span id="paymentTerms" style="font-weight:600;">  מיום קבלת חשבונית המס בגין הצעה זו.</span></p>
-        </div>
-      </div>
-
-      <!-- Digital Signature -->
-      <div class="signature-section" id="signatureSection">
-        <h3 class="section-title">חתימה דיגיטלית</h3>
-        <div class="sig-field-group">
-          <label class="sig-label">שם החותם</label>
-          <input type="text" class="sig-input" id="signerName" placeholder="הכנס שם מלא...">
-
-          <label class="sig-label">חתימה</label>
-          <div class="canvas-wrapper">
-            <canvas id="signatureCanvas"></canvas>
-            <div class="canvas-placeholder" id="canvasPlaceholder">חתום כאן עם העכבר או האצבע</div>
+        <!-- Info Grid -->
+        <div class="info-grid">
+          <div class="info-block">
+            <span class="info-label">לקוח</span>
+            <span class="info-value" id="customerName"></span>
           </div>
-
-          <div class="sig-buttons">
-            <button class="btn btn-primary" id="btnApprove" disabled>אשר וחתום</button>
-            <button class="btn btn-secondary" id="btnClear">נקה</button>
+          <div class="info-block">
+            <span class="info-label">תאריך</span>
+            <span class="info-value" id="quoteDate"></span>
+          </div>
+          <div class="info-block">
+            <span class="info-label">איש קשר</span>
+            <span class="info-value" id="contactName"></span>
+          </div>
+          <div class="info-block">
+            <span class="info-label">נציג</span>
+            <span class="info-value" id="repName"></span>
           </div>
         </div>
-      </div>
 
-      <!-- Bank Details -->
-      <div class="section-block">
-        <h3 class="section-title">פרטי בנק להעברה</h3>
-        <div class="bank-details">
-          <div class="detail-line">בנק: <strong>10</strong>&nbsp;&nbsp;&nbsp;סניף: <strong>827</strong>&nbsp;&nbsp;&nbsp;חשבון: <strong>600006</strong></div>
+        <!-- Subject -->
+        <div class="quote-subject-line" id="subjectLine"></div>
+
+        <!-- Intro Text -->
+        <div class="quote-intro-text" id="introText">
+          בהמשך לשיחתנו, להלן הצעת המחיר לביצוע העבודה כמפורט מטה.
         </div>
-      </div>
 
-      <!-- Footer -->
-      <div class="quote-footer">
-        <div class="footer-greeting">בכבוד רב,</div>
-        <div class="footer-name">אבי אמיגה</div>
-        <div class="footer-company">אברהם פרסום בעמ</div>
-      </div>
+        <!-- Items Table -->
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th>תיאור</th>
+              <th class="col-bruto">ברוטו</th>
+              <th class="col-neto">נטו</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
 
+        <!-- Total -->
+        <div class="total-row">
+          <span class="total-label">סה"כ לפני מע"מ</span>
+          <span class="total-amount" id="totalAmount"></span>
+        </div>
+
+        <!-- Payment Terms -->
+        <div class="section-block">
+          <h3 class="section-title">תנאי תשלום</h3>
+          <div class="section-text" id="paymentTermsText"></div>
+        </div>
+
+        <!-- Digital Signature -->
+        <div class="signature-section" id="signatureSection">
+          <h3 class="section-title">חתימה דיגיטלית</h3>
+          <div class="sig-field-group">
+            <label class="sig-label">שם החותם</label>
+            <input type="text" class="sig-input" id="signerName" placeholder="הכנס שם מלא...">
+
+            <label class="sig-label">חתימה</label>
+            <div class="canvas-wrapper">
+              <canvas id="signatureCanvas"></canvas>
+              <div class="canvas-placeholder" id="canvasPlaceholder">חתום כאן עם העכבר או האצבע</div>
+            </div>
+
+            <div class="sig-buttons">
+              <button class="btn btn-primary" id="btnApprove" disabled>אשר וחתום</button>
+              <button class="btn btn-secondary" id="btnClear">נקה</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank Details -->
+        <div class="section-block">
+          <h3 class="section-title">פרטי בנק להעברה</h3>
+          <div class="bank-details" id="bankDetails"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="quote-footer">
+          <div class="footer-greeting">בכבוד רב,</div>
+          <div class="footer-name" id="senderName"></div>
+          <div class="footer-company" id="senderCompany"></div>
+          <div class="footer-copy">כל הזכויות שמורות | אברהם פרסום בעמ</div>
+        </div>
+
+      </div>
     </div>
   </div>
+
 </div>
 
 <!-- Approval Overlay -->
@@ -588,29 +636,7 @@
 
 <script>
   // ══════════════════════════════════════════
-  // MOCK DATA — Replace with API fetch later
-  // ══════════════════════════════════════════
-  const MOCK_QUOTE = {
-    quote_number: "00011",
-    date: "13.3.2026",
-    customer_name: "אמיגה גרופ",
-    contact_name: "הנרי אמיגה",
-    contact_phone: "052-9288485",
-    subject: "פסח 2026",
-    intro_name: "הנרי אמיגה",
-    payment_terms: "  מיום קבלת חשבונית המס בגין הצעה זו.",
-    items: [
-      { description: "מאסטר", qty: 4, price: 8000 },
-      { description: "קרוסלה", qty: 2, price: 400 },
-    ],
-    bank: { bank: 10, branch: 827, account: 600006 },
-    sender_name: "אבי אמיגה",
-    sender_company: "אברהם פרסום בעמ",
-    status: "pending" // pending | approved
-  };
-
-  // ══════════════════════════════════════════
-  // API Configuration (for future BASE44 integration)
+  // API Configuration — BASE44 Integration
   // ══════════════════════════════════════════
   const API_BASE = "https://avraham-ap-flow.base44.app/functions";
 
@@ -620,57 +646,101 @@
     return params.get("token");
   }
 
-  // Future: Fetch quote data from BASE44
+  // Fetch quote data from BASE44
   async function fetchQuoteData(token) {
-    // TODO: Replace mock with real API call
-    // const response = await fetch(`${API_BASE}/getQuote?token=${token}`);
-    // if (!response.ok) throw new Error("Quote not found");
-    // return await response.json();
-    return MOCK_QUOTE;
+    const response = await fetch(`${API_BASE}/getQuote?token=${token}`);
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(err || "הצעת מחיר לא נמצאה");
+    }
+    return await response.json();
   }
 
-  // Future: Submit approval to BASE44
+  // Submit approval to BASE44
   async function submitApproval(token, signerName, signatureDataUrl) {
-    // TODO: Replace with real API call
-    // const response = await fetch(`${API_BASE}/approveQuote`, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ token, signer_name: signerName, signature: signatureDataUrl })
-    // });
-    // if (!response.ok) throw new Error("Approval failed");
-    // return await response.json();
-    return { success: true };
+    const response = await fetch(`${API_BASE}/approveQuote`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, signer_name: signerName, signature: signatureDataUrl })
+    });
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(err || "שגיאה באישור ההצעה");
+    }
+    return await response.json();
   }
 
   // ══════════════════════════════════════════
   // Render Quote Data
   // ══════════════════════════════════════════
   function renderQuote(data) {
-    document.getElementById("quoteNumber").textContent = data.quote_number;
-    document.getElementById("quoteDate").textContent = data.date;
-    document.getElementById("customerName").textContent = data.customer_name;
-    document.getElementById("contactName").textContent = data.contact_name;
-    document.getElementById("contactPhone").textContent = data.contact_phone;
-    document.getElementById("quoteSubject").textContent = data.subject;
-    document.getElementById("introText").textContent = "היי " + data.intro_name;
-    document.getElementById("paymentTerms").textContent = data.payment_terms;
+    // Subtitle: "Q-00011 — פסח 2026"
+    const subtitle = document.getElementById("quoteSubtitle");
+    const parts = [];
+    if (data.quote_number) parts.push(data.quote_number);
+    if (data.subject) parts.push(data.subject);
+    subtitle.textContent = parts.join(" — ");
 
+    // Info grid
+    document.getElementById("customerName").textContent = data.customer_name || "";
+    document.getElementById("quoteDate").textContent = data.date || "";
+    document.getElementById("contactName").textContent = data.contact_name || "";
+    document.getElementById("repName").textContent = data.rep_name || data.sender_name || "";
+
+    // Subject line
+    if (data.subject) {
+      document.getElementById("subjectLine").innerHTML = "<strong>הנדון:</strong> " + data.subject;
+    }
+
+    // Intro text
+    if (data.intro_text) {
+      document.getElementById("introText").textContent = data.intro_text;
+    }
+
+    // Payment terms
+    const payTerms = document.getElementById("paymentTermsText");
+    if (data.payment_terms) {
+      payTerms.innerHTML = "בהתאם למוסכם עמכם,<br>תנאי התשלום הם <strong>" + data.payment_terms + "</strong>";
+    }
+
+    // Bank details
+    if (data.bank) {
+      document.getElementById("bankDetails").innerHTML =
+        "בנק: <strong>" + (data.bank.bank || "") + "</strong>&nbsp;&nbsp;&nbsp;" +
+        "סניף: <strong>" + (data.bank.branch || "") + "</strong>&nbsp;&nbsp;&nbsp;" +
+        "חשבון: <strong>" + (data.bank.account || "") + "</strong>";
+    }
+
+    // Sender
+    document.getElementById("senderName").textContent = data.sender_name || "";
+    document.getElementById("senderCompany").textContent = data.sender_company || "אברהם פרסום בעמ";
+
+    // Logo override
+    if (data.logo_url) {
+      document.getElementById("companyLogo").src = data.logo_url;
+    }
+
+    // Items table
     const tbody = document.getElementById("itemsBody");
     tbody.innerHTML = "";
     let total = 0;
 
-    data.items.forEach(item => {
-      total += item.price;
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="col-description">${item.description}</td>
-        <td class="col-qty">${item.qty}</td>
-        <td class="col-price">₪${item.price.toLocaleString()}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+    if (data.items && data.items.length > 0) {
+      data.items.forEach((item, idx) => {
+        const neto = item.price || item.neto || 0;
+        const bruto = item.bruto || item.original_price || neto;
+        total += neto;
+        const tr = document.createElement("tr");
+        tr.innerHTML =
+          '<td class="col-num">' + (idx + 1) + "</td>" +
+          "<td>" + (item.description || "") + "</td>" +
+          '<td class="col-bruto">' + (bruto !== neto ? "\u20AA" + bruto.toLocaleString() : "") + "</td>" +
+          '<td class="col-neto">\u20AA' + neto.toLocaleString() + "</td>";
+        tbody.appendChild(tr);
+      });
+    }
 
-    document.getElementById("totalAmount").textContent = `₪${total.toLocaleString()}`;
+    document.getElementById("totalAmount").textContent = "\u20AA" + total.toLocaleString();
 
     // Status
     const banner = document.getElementById("statusBanner");
@@ -699,20 +769,20 @@
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.scale(dpr, dpr);
-      ctx.strokeStyle = "#1a1a2e";
+      ctx.strokeStyle = "#1e293b";
       ctx.lineWidth = 2.5;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
     }
 
     resizeCanvas();
-    window.addEventListener("resize", () => {
+    window.addEventListener("resize", function() {
       if (!hasDrawn) resizeCanvas();
     });
 
     function getPos(e) {
       const rect = canvas.getBoundingClientRect();
-      let clientX, clientY;
+      var clientX, clientY;
       if (e.touches && e.touches.length > 0) {
         clientX = e.touches[0].clientX;
         clientY = e.touches[0].clientY;
@@ -720,16 +790,13 @@
         clientX = e.clientX;
         clientY = e.clientY;
       }
-      return {
-        x: clientX - rect.left,
-        y: clientY - rect.top
-      };
+      return { x: clientX - rect.left, y: clientY - rect.top };
     }
 
     function startDraw(e) {
       e.preventDefault();
       isDrawing = true;
-      const pos = getPos(e);
+      var pos = getPos(e);
       lastX = pos.x;
       lastY = pos.y;
       ctx.beginPath();
@@ -744,7 +811,7 @@
     function draw(e) {
       if (!isDrawing) return;
       e.preventDefault();
-      const pos = getPos(e);
+      var pos = getPos(e);
       ctx.beginPath();
       ctx.moveTo(lastX, lastY);
       ctx.lineTo(pos.x, pos.y);
@@ -753,10 +820,8 @@
       lastY = pos.y;
     }
 
-    function endDraw(e) {
-      if (isDrawing) {
-        isDrawing = false;
-      }
+    function endDraw() {
+      isDrawing = false;
     }
 
     // Mouse events
@@ -772,41 +837,40 @@
     canvas.addEventListener("touchcancel", endDraw);
 
     // Clear
-    document.getElementById("btnClear").addEventListener("click", () => {
+    document.getElementById("btnClear").addEventListener("click", function() {
       resizeCanvas();
       hasDrawn = false;
       placeholder.classList.remove("hidden");
       updateApproveButton();
     });
 
-    // Get data URL
-    canvas.getSignatureData = () => {
+    // Expose helpers
+    canvas.getSignatureData = function() {
       if (!hasDrawn) return null;
       return canvas.toDataURL("image/png");
     };
-
-    canvas.hasSignature = () => hasDrawn;
+    canvas.hasSignature = function() { return hasDrawn; };
   }
 
   // ══════════════════════════════════════════
   // Approve Button Logic
   // ══════════════════════════════════════════
   function updateApproveButton() {
-    const name = document.getElementById("signerName").value.trim();
-    const canvas = document.getElementById("signatureCanvas");
-    const btn = document.getElementById("btnApprove");
+    var name = document.getElementById("signerName").value.trim();
+    var canvas = document.getElementById("signatureCanvas");
+    var btn = document.getElementById("btnApprove");
     btn.disabled = !(name.length > 0 && canvas.hasSignature && canvas.hasSignature());
   }
 
   function initApproval() {
-    const nameInput = document.getElementById("signerName");
+    var nameInput = document.getElementById("signerName");
     nameInput.addEventListener("input", updateApproveButton);
 
-    document.getElementById("btnApprove").addEventListener("click", async () => {
-      const btn = document.getElementById("btnApprove");
-      const name = nameInput.value.trim();
-      const canvas = document.getElementById("signatureCanvas");
-      const sigData = canvas.getSignatureData();
+    document.getElementById("btnApprove").addEventListener("click", async function() {
+      var btn = document.getElementById("btnApprove");
+      var name = nameInput.value.trim();
+      var canvas = document.getElementById("signatureCanvas");
+      var sigData = canvas.getSignatureData();
 
       if (!name || !sigData) return;
 
@@ -814,12 +878,12 @@
       btn.textContent = "שולח...";
 
       try {
-        const token = getToken();
+        var token = getToken();
         await submitApproval(token, name, sigData);
 
         // Show success
         document.getElementById("approvalOverlay").classList.add("active");
-        const banner = document.getElementById("statusBanner");
+        var banner = document.getElementById("statusBanner");
         banner.className = "status-banner approved";
         banner.textContent = "הצעה זו אושרה";
 
@@ -836,15 +900,31 @@
   // ══════════════════════════════════════════
   // Initialize
   // ══════════════════════════════════════════
-  document.addEventListener("DOMContentLoaded", async () => {
+  document.addEventListener("DOMContentLoaded", async function() {
+    var loadingEl = document.getElementById("loadingState");
+    var errorEl = document.getElementById("errorState");
+    var contentEl = document.getElementById("quoteContent");
+
     try {
-      const token = getToken();
-      const data = await fetchQuoteData(token);
+      var token = getToken();
+      if (!token) {
+        throw new Error("לא סופק טוקן. נא לפנות לשולח ההצעה.");
+      }
+
+      var data = await fetchQuoteData(token);
       renderQuote(data);
       initSignatureCanvas();
       initApproval();
+
+      // Hide loading, show content
+      loadingEl.style.display = "none";
+      contentEl.style.display = "block";
+
     } catch (err) {
       console.error("Error loading quote:", err);
+      loadingEl.style.display = "none";
+      document.getElementById("errorMessage").textContent = err.message || "הצעת מחיר לא נמצאה";
+      errorEl.style.display = "block";
     }
   });
 </script>
