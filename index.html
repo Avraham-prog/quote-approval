@@ -484,12 +484,64 @@
     margin-bottom: 18px;
   }
 
+  /* ── Approved Signature Display ── */
+  .approved-signature {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+  }
+
+  .approved-sig-box {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+  }
+
+  .approved-sig-img {
+    max-width: 280px;
+    height: auto;
+    margin: 0 auto 12px;
+    display: block;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 12px;
+  }
+
+  .approved-sig-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 2px;
+  }
+
+  .approved-sig-date {
+    font-size: 0.82rem;
+    color: #94a3b8;
+  }
+
+  .approved-sig-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #d1fae5;
+    color: #065f46;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-top: 10px;
+  }
+
   /* ── Print ── */
   @media print {
     body { background: #fff; }
     .page-wrapper { padding: 0; max-width: 100%; }
-    .status-banner, .signature-section, .sig-buttons { display: none; }
+    .status-banner, .sig-buttons { display: none; }
     .quote-card { box-shadow: none; border-radius: 0; }
+    .approved-sig-box { border: 1px solid #ccc; }
   }
 </style>
 </head>
@@ -601,6 +653,17 @@
               <button class="btn btn-primary" id="btnApprove" disabled>אשר וחתום</button>
               <button class="btn btn-secondary" id="btnClear">נקה</button>
             </div>
+          </div>
+        </div>
+
+        <!-- Approved Signature (shown when quote is approved) -->
+        <div class="approved-signature" id="approvedSignature" style="display:none;">
+          <h3 class="section-title">חתימה דיגיטלית</h3>
+          <div class="approved-sig-box">
+            <img class="approved-sig-img" id="approvedSigImg" alt="חתימה דיגיטלית" src="">
+            <div class="approved-sig-name" id="approvedSigName"></div>
+            <div class="approved-sig-date" id="approvedSigDate"></div>
+            <div class="approved-sig-badge">&#10003; אושר ונחתם דיגיטלית</div>
           </div>
         </div>
 
@@ -747,7 +810,30 @@
     if (data.status === "approved") {
       banner.className = "status-banner approved";
       banner.textContent = "הצעה זו אושרה";
+
+      // Hide the signing form
       document.getElementById("signatureSection").style.display = "none";
+
+      // Show the approved signature section
+      if (data.signer_name || data.signature_url) {
+        var sigSection = document.getElementById("approvedSignature");
+        sigSection.style.display = "block";
+
+        if (data.signature_url) {
+          document.getElementById("approvedSigImg").src = data.signature_url;
+        } else {
+          document.getElementById("approvedSigImg").style.display = "none";
+        }
+
+        document.getElementById("approvedSigName").textContent = data.signer_name || "";
+
+        if (data.signed_at) {
+          var d = new Date(data.signed_at);
+          var formatted = d.toLocaleDateString("he-IL", { year: "numeric", month: "long", day: "numeric" })
+            + " " + d.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" });
+          document.getElementById("approvedSigDate").textContent = formatted;
+        }
+      }
     }
   }
 
@@ -913,12 +999,14 @@
 
       var data = await fetchQuoteData(token);
       renderQuote(data);
-      initSignatureCanvas();
-      initApproval();
 
-      // Hide loading, show content
+      // Show content first so canvas can measure its size
       loadingEl.style.display = "none";
       contentEl.style.display = "block";
+
+      // Init signature after content is visible
+      initSignatureCanvas();
+      initApproval();
 
     } catch (err) {
       console.error("Error loading quote:", err);
