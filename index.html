@@ -975,6 +975,16 @@
 
         // Hide signature section
         document.getElementById("signatureSection").style.display = "none";
+
+        // Show the approved signature with signer name and signature image
+        var sigSection = document.getElementById("approvedSignature");
+        sigSection.style.display = "block";
+        document.getElementById("approvedSigImg").src = sigData;
+        document.getElementById("approvedSigName").textContent = name;
+        var now = new Date();
+        var formatted = now.toLocaleDateString("he-IL", { year: "numeric", month: "long", day: "numeric" })
+          + " " + now.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" });
+        document.getElementById("approvedSigDate").textContent = formatted;
       } catch (err) {
         alert("שגיאה באישור ההצעה: " + err.message);
         btn.disabled = false;
