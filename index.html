@@ -807,7 +807,7 @@
         tr.innerHTML =
           '<td class="col-num">' + (idx + 1) + "</td>" +
           "<td>" + (item.description || "") + "</td>" +
-          '<td class="col-qty">' + ((item.quantity || 1) > 1 ? (item.quantity) : "") + "</td>" +
+          '<td class="col-qty">' + (item.activity_type && item.activity_type.startsWith("מחירונים") ? (item.quantity || 1) : "") + "</td>" +
           '<td class="col-bruto">' + (bruto !== neto ? "\u20AA" + bruto.toLocaleString() : "") + "</td>" +
           '<td class="col-neto">\u20AA' + neto.toLocaleString() + "</td>";
         tbody.appendChild(tr);
