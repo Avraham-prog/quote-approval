@@ -812,7 +812,7 @@
         const tr = document.createElement("tr");
         tr.innerHTML =
           '<td class="col-num">' + (idx + 1) + "</td>" +
-          "<td>" + (item.description || "") + "</td>" +
+          "<td>" + (item.vendor_name && item.description ? item.vendor_name + " \u2013 " + item.description : (item.description || item.vendor_name || "")) + "</td>" +
           '<td class="col-qty">' + (item.activity_type && item.activity_type.startsWith("מחירונים") ? (item.quantity || 1) : "") + "</td>" +
           '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto && bruto !== neto ? "\u20AA" + bruto.toLocaleString() : "") + "</td>" +
           '<td class="col-neto">\u20AA' + neto.toLocaleString() + "</td>";
