@@ -16,7 +16,8 @@ Single-file app: `index.html` (HTML + CSS + JS, RTL Hebrew)
 
 ## BASE44 Entity Field Mappings
 ### Quote
-`quote_number`, `quote_date`, `customer_name`, `contact_name`, `contact_phone`, `employee_name`, `title`, `payment_terms_text`, `intro_text`, `status`, `signature_token`, `approval_token`, `signer_name`, `signature_url`, `signed_at`, `approved_date`
+`quote_number`, `quote_date`, `quote_type`, `customer_name`, `contact_name`, `contact_phone`, `employee_name`, `title`, `payment_terms_text`, `intro_text`, `status`, `signature_token`, `approval_token`, `signer_name`, `signature_url`, `signed_at`, `approved_date`
+- `quote_type` values: `"detailed_gross_net"` (shows bruto+neto), `"detailed_net"` (neto only)
 
 ### QuoteLine
 `quote_id`, `description`, `vendor_name`, `activity_type`, `quantity`, `line_order`, `client_gross`, `client_net`, `vendor_gross`, `vendor_net`, `vendor_commission_pct`, `client_commission_pct`, `profit_margin_pct`, `profit`, `department`, `air_date_start`, `air_date_end`
@@ -24,7 +25,7 @@ Single-file app: `index.html` (HTML + CSS + JS, RTL Hebrew)
 ## Key Business Logic
 - **Description fallback**: `l.description || l.vendor_name || l.activity_type || ''` — activity rows (e.g., Google) have empty `description`, use `vendor_name`
 - **Quantity display**: Only show for price-list rows (`activity_type.startsWith("מחירונים")`), not for activity rows (e.g., `"פרפורמנס"`)
-- **Bruto column**: Only shown when bruto !== neto (i.e., there's a discount)
+- **Bruto column**: Controlled by `quote_type` field. `"detailed_gross_net"` shows bruto crossed-out + neto; `"detailed_net"` hides bruto column entirely
 - **Signature flow**: After approval, hide signing form, show `approvedSignature` div with signer name + signature image + date
 
 ## BASE44 Deployment (CRITICAL)
