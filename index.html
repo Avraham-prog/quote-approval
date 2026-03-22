@@ -797,6 +797,12 @@
     const tbody = document.getElementById("itemsBody");
     tbody.innerHTML = "";
     let total = 0;
+    const showBruto = data.quote_type !== "detailed_net";
+
+    // Hide bruto column header if not needed
+    if (!showBruto) {
+      document.querySelector("th.col-bruto").style.display = "none";
+    }
 
     if (data.items && data.items.length > 0) {
       data.items.forEach((item, idx) => {
@@ -808,7 +814,7 @@
           '<td class="col-num">' + (idx + 1) + "</td>" +
           "<td>" + (item.description || "") + "</td>" +
           '<td class="col-qty">' + (item.activity_type && item.activity_type.startsWith("מחירונים") ? (item.quantity || 1) : "") + "</td>" +
-          '<td class="col-bruto">' + (bruto !== neto ? "\u20AA" + bruto.toLocaleString() : "") + "</td>" +
+          '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto && bruto !== neto ? "\u20AA" + bruto.toLocaleString() : "") + "</td>" +
           '<td class="col-neto">\u20AA' + neto.toLocaleString() + "</td>";
         tbody.appendChild(tr);
       });
