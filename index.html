@@ -768,7 +768,22 @@
     // Payment terms
     const payTerms = document.getElementById("paymentTermsText");
     if (data.payment_terms) {
-      payTerms.innerHTML = "בהתאם למוסכם עמכם,<br>תנאי התשלום הם <strong>" + data.payment_terms + "</strong>";
+      const paymentTermsMap = {
+        "current_30": "שוטף + 30",
+        "current_45": "שוטף + 45",
+        "current_60": "שוטף + 60",
+        "current_90": "שוטף + 90",
+        "immediate": "מיידי",
+        "prepaid": "תשלום מראש",
+        "eom": "סוף חודש",
+        "eom_30": "סוף חודש + 30",
+        "eom_60": "סוף חודש + 60",
+      };
+      let termsText = data.payment_terms;
+      Object.keys(paymentTermsMap).forEach(key => {
+        termsText = termsText.replace(new RegExp(key, 'g'), paymentTermsMap[key]);
+      });
+      payTerms.innerHTML = "בהתאם למוסכם עמכם,<br>תנאי התשלום הם <strong>" + termsText + "</strong>";
     }
 
     // Bank details
