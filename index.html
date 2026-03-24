@@ -802,8 +802,8 @@
       var bi = data.bank_info;
       document.getElementById("bankDeductionDetails").innerHTML =
         "סכום בנק מקורי: <strong>\u20AA" + (bi.original_amount || 0).toLocaleString() + "</strong> | " +
-        "מומש עד כה: <strong>\u20AA" + (bi.used_amount || 0).toLocaleString() + "</strong> | " +
-        "יתרה לאחר פעילות זו: <strong>\u20AA" + (bi.remaining || 0).toLocaleString() + "</strong>";
+        "מומש עד כה: <strong>\u20AA" + (bi.used || bi.used_amount || 0).toLocaleString() + "</strong> | " +
+        "יתרה לאחר פעילות זו: <strong>\u20AA" + (bi.balance || bi.remaining || 0).toLocaleString() + "</strong>";
     } else if (data.bank) {
       // Regular quote: show bank transfer details
       document.getElementById("bankDetails").innerHTML =
