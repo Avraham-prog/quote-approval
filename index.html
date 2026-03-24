@@ -775,7 +775,8 @@
 
     // Payment terms
     const payTerms = document.getElementById("paymentTermsText");
-    if (data.payment_terms) {
+    var rawTerms = data.payment_terms || data.payment_terms_text || "";
+    if (rawTerms) {
       const paymentTermsMap = {
         "current_30": "שוטף + 30",
         "current_45": "שוטף + 45",
@@ -787,11 +788,16 @@
         "eom_30": "סוף חודש + 30",
         "eom_60": "סוף חודש + 60",
       };
-      let termsText = data.payment_terms;
+      let termsText = rawTerms;
       Object.keys(paymentTermsMap).forEach(key => {
         termsText = termsText.replace(new RegExp(key, 'g'), paymentTermsMap[key]);
       });
-      payTerms.innerHTML = "בהתאם למוסכם עמכם,<br>תנאי התשלום הם <strong>" + termsText + "</strong>";
+      // If payment_terms_text already contains full sentence, use as-is; otherwise wrap
+      if (termsText.includes("תנאי התשלום")) {
+        payTerms.innerHTML = termsText.replace(/\n/g, "<br>");
+      } else {
+        payTerms.innerHTML = "בהתאם למוסכם עמכם,<br>תנאי התשלום הם <strong>" + termsText + "</strong>";
+      }
     }
 
     // Bank-linked quote handling
