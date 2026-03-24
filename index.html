@@ -673,8 +673,16 @@
           </div>
         </div>
 
-        <!-- Bank Details -->
-        <div class="section-block">
+        <!-- Bank Deduction Notice (for bank-linked quotes) -->
+        <div class="section-block" id="bankDeductionSection" style="display:none">
+          <div style="background:#FFF8E1;border:1px solid #FFD54F;border-radius:8px;padding:16px;text-align:center;">
+            <div style="font-weight:bold;font-size:1.1em;margin-bottom:8px;">פעילות זו מקודזת מיתרת הבנק — ללא תשלום נוסף.</div>
+            <div id="bankDeductionDetails" style="font-size:0.95em;color:#555;"></div>
+          </div>
+        </div>
+
+        <!-- Bank Details (for regular quotes) -->
+        <div class="section-block" id="bankTransferSection">
           <h3 class="section-title">פרטי בנק להעברה</h3>
           <div class="bank-details" id="bankDetails"></div>
         </div>
@@ -786,8 +794,18 @@
       payTerms.innerHTML = "בהתאם למוסכם עמכם,<br>תנאי התשלום הם <strong>" + termsText + "</strong>";
     }
 
-    // Bank details
-    if (data.bank) {
+    // Bank-linked quote: hide payment terms & bank transfer, show deduction notice
+    if (data.bank_info) {
+      document.querySelector("#paymentTermsText").parentElement.style.display = "none";
+      document.getElementById("bankTransferSection").style.display = "none";
+      document.getElementById("bankDeductionSection").style.display = "block";
+      var bi = data.bank_info;
+      document.getElementById("bankDeductionDetails").innerHTML =
+        "סכום בנק מקורי: <strong>\u20AA" + (bi.original_amount || 0).toLocaleString() + "</strong> | " +
+        "מומש עד כה: <strong>\u20AA" + (bi.used_amount || 0).toLocaleString() + "</strong> | " +
+        "יתרה לאחר פעילות זו: <strong>\u20AA" + (bi.remaining || 0).toLocaleString() + "</strong>";
+    } else if (data.bank) {
+      // Regular quote: show bank transfer details
       document.getElementById("bankDetails").innerHTML =
         "בנק: <strong>" + (data.bank.bank || "") + "</strong>&nbsp;&nbsp;&nbsp;" +
         "סניף: <strong>" + (data.bank.branch || "") + "</strong>&nbsp;&nbsp;&nbsp;" +
