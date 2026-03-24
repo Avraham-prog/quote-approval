@@ -858,7 +858,8 @@
     }
 
     if (isHybrid) {
-      // HYBRID QUOTE: bank items first, then billable items
+      // HYBRID QUOTE: match BASE44 layout exactly
+      // 1. Bank items in main table with subtotal
       let bankTotal = 0;
       bankItems.forEach((item, idx) => {
         bankTotal += (item.price || item.neto || 0);
@@ -866,35 +867,60 @@
       });
 
       // Bank subtotal row
+      var colSpan = showBruto ? 4 : 3;
       var bankSubRow = document.createElement("tr");
-      bankSubRow.innerHTML = '<td colspan="' + (showBruto ? 4 : 3) + '" style="text-align:right;font-weight:bold;border-top:2px solid #1a73e8;">סה"כ מבנק</td><td class="col-neto" style="font-weight:bold;border-top:2px solid #1a73e8;color:#1a73e8;">\u20AA' + bankTotal.toLocaleString() + '</td>';
+      bankSubRow.innerHTML = '<td colspan="' + colSpan + '" style="text-align:right;font-weight:bold;border-top:2px solid #333;">\u05e1\u05d4"\u05db \u05dc\u05e4\u05e0\u05d9 \u05de\u05e2"\u05de</td><td class="col-neto" style="font-weight:bold;border-top:2px solid #333;">\u20AA' + bankTotal.toLocaleString() + '</td>';
       tbody.appendChild(bankSubRow);
 
-      // Separator with billable section title
-      var sepRow = document.createElement("tr");
-      sepRow.innerHTML = '<td colspan="' + (showBruto ? 5 : 4) + '" style="text-align:center;padding:12px 0 4px;font-weight:bold;font-size:1.05em;color:#333;background:#f8f8f8;">פעילות נוספת לחיוב</td>';
-      tbody.appendChild(sepRow);
-
-      // Billable items
-      let billableTotal = 0;
-      billableItems.forEach((item, idx) => {
-        billableTotal += (item.price || item.neto || 0);
-        tbody.appendChild(renderItemRow(item, bankItems.length + idx));
-      });
-
-      // Show total as billable total only
-      document.getElementById("totalAmount").textContent = "\u20AA" + billableTotal.toLocaleString();
-
-      // For hybrid: show bank deduction for bank part, and payment terms for billable part
+      // 2. Insert bank deduction notice AFTER the table (before billable section)
+      var tableEl = tbody.closest("table");
       if (data.bank_info) {
-        document.getElementById("bankDeductionSection").style.display = "block";
         var bi = data.bank_info;
-        document.getElementById("bankDeductionDetails").innerHTML =
-          "\u05e1\u05db\u05d5\u05dd \u05d1\u05e0\u05e7 \u05de\u05e7\u05d5\u05e8\u05d9: <strong>\u20AA" + (bi.original_amount || 0).toLocaleString() + "</strong> | " +
-          "\u05de\u05d5\u05de\u05e9 \u05e2\u05d3 \u05db\u05d4: <strong>\u20AA" + (bi.used || bi.used_amount || 0).toLocaleString() + "</strong> | " +
-          "\u05d9\u05ea\u05e8\u05d4: <strong>\u20AA" + (bi.balance || bi.remaining || 0).toLocaleString() + "</strong>";
+        var bankNotice = document.createElement("div");
+        bankNotice.style.cssText = "background:#FFF8E1;border:1px solid #FFD54F;border-radius:8px;padding:16px;text-align:center;margin:16px 0;";
+        bankNotice.innerHTML =
+          '<div style="font-weight:bold;font-size:1.1em;margin-bottom:8px;">\u05e4\u05e2\u05d9\u05dc\u05d5\u05ea \u05d6\u05d5 \u05de\u05e7\u05d5\u05d3\u05d6\u05ea \u05de\u05d9\u05ea\u05e8\u05ea \u05d4\u05d1\u05e0\u05e7 \u2014 \u05dc\u05dc\u05d0 \u05ea\u05e9\u05dc\u05d5\u05dd \u05e0\u05d5\u05e1\u05e3.</div>' +
+          '<div style="font-size:0.95em;color:#555;">' +
+          '\u05e1\u05db\u05d5\u05dd \u05d1\u05e0\u05e7 \u05de\u05e7\u05d5\u05e8\u05d9: <strong>\u20AA' + (bi.original_amount || 0).toLocaleString() + '</strong><br>' +
+          '\u05de\u05d5\u05de\u05e9 \u05e2\u05d3 \u05db\u05d4: <strong>\u20AA' + (bi.used || bi.used_amount || 0).toLocaleString() + '</strong><br>' +
+          '\u05d9\u05ea\u05e8\u05d4 \u05dc\u05d0\u05d7\u05e8 \u05e4\u05e2\u05d9\u05dc\u05d5\u05ea \u05d6\u05d5: <strong>\u20AA' + (bi.balance || bi.remaining || 0).toLocaleString() + '</strong></div>';
+        tableEl.parentNode.insertBefore(bankNotice, tableEl.nextSibling);
+
+        // 3. Create billable section with its own header, table, total, and separator
+        var billableSection = document.createElement("div");
+        billableSection.style.cssText = "margin-top:24px;border-top:2px solid #ddd;padding-top:16px;";
+
+        var billableHeader = document.createElement("h3");
+        billableHeader.style.cssText = "text-align:center;font-weight:bold;font-size:1.05em;margin-bottom:12px;";
+        billableHeader.textContent = "\u05e4\u05e2\u05d9\u05dc\u05d5\u05ea \u05e0\u05d5\u05e1\u05e4\u05ea \u05dc\u05d7\u05d9\u05d5\u05d1";
+        billableSection.appendChild(billableHeader);
+
+        // Clone table header for billable section
+        var billableTable = tableEl.cloneNode(false);
+        billableTable.innerHTML = tableEl.querySelector("thead").outerHTML;
+        var billableTbody = document.createElement("tbody");
+
+        let billableTotal = 0;
+        billableItems.forEach((item, idx) => {
+          billableTotal += (item.price || item.neto || 0);
+          billableTbody.appendChild(renderItemRow(item, idx));
+        });
+        billableTable.appendChild(billableTbody);
+        billableSection.appendChild(billableTable);
+
+        // Billable total
+        var billableTotalDiv = document.createElement("div");
+        billableTotalDiv.className = "total-row";
+        billableTotalDiv.innerHTML = '<span class="total-label">\u05e1\u05d4"\u05db \u05dc\u05e4\u05e0\u05d9 \u05de\u05e2"\u05de</span><span class="total-amount" style="color:#1a73e8;font-weight:bold;">\u20AA' + billableTotal.toLocaleString() + '</span>';
+        billableSection.appendChild(billableTotalDiv);
+
+        bankNotice.parentNode.insertBefore(billableSection, bankNotice.nextSibling);
       }
-      // Keep payment terms and bank transfer visible for the billable portion
+
+      // Hide the original total row (we show it in billable section)
+      document.getElementById("totalAmount").parentElement.style.display = "none";
+      // Hide bank deduction section (we inserted inline)
+      document.getElementById("bankDeductionSection").style.display = "none";
     } else {
       // SIMPLE QUOTE: all items in one table
       let total = 0;
