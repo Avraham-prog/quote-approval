@@ -838,7 +838,9 @@
     // Items table - split bank lines from billable lines
     const tbody = document.getElementById("itemsBody");
     tbody.innerHTML = "";
-    const showBruto = data.quote_type !== "detailed_net";
+    const qt = data.quote_type || "detailed_gross_net";
+    const isSummary = qt.startsWith("summary");
+    const showBruto = qt === "detailed_gross_net" || qt === "summary_gross_net";
 
     // Hide bruto column header if not needed
     if (!showBruto) {
@@ -907,8 +909,27 @@
       document.getElementById("totalAmount").textContent = "\u20AA" + billableTotal.toLocaleString();
       // Hide static bank deduction section
       document.getElementById("bankDeductionSection").style.display = "none";
+    } else if (isSummary) {
+      // SUMMARY QUOTE: show ONE row with quote title and total amount
+      let total = 0;
+      if (data.items && data.items.length > 0) {
+        data.items.forEach(item => { total += (item.price || item.neto || 0); });
+      }
+      var totalBruto = 0;
+      if (showBruto && data.items) {
+        data.items.forEach(item => { totalBruto += (item.bruto || item.original_price || item.price || item.neto || 0); });
+      }
+      var summaryRow = document.createElement("tr");
+      summaryRow.innerHTML =
+        '<td class="col-num">1</td>' +
+        "<td>" + (data.subject || "") + "</td>" +
+        '<td class="col-qty"></td>' +
+        '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto && totalBruto !== total ? "\u20AA" + totalBruto.toLocaleString() : "") + "</td>" +
+        '<td class="col-neto">\u20AA' + total.toLocaleString() + "</td>";
+      tbody.appendChild(summaryRow);
+      document.getElementById("totalAmount").textContent = "\u20AA" + total.toLocaleString();
     } else {
-      // SIMPLE QUOTE: all items in one table
+      // DETAILED QUOTE: all items in one table
       let total = 0;
       if (data.items && data.items.length > 0) {
         data.items.forEach((item, idx) => {
