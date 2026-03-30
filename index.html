@@ -676,7 +676,7 @@
         <!-- Bank Deduction Notice (for bank-linked quotes) -->
         <div class="section-block" id="bankDeductionSection" style="display:none">
           <div style="background:#FFF8E1;border:1px solid #FFD54F;border-radius:8px;padding:16px;text-align:center;">
-            <div style="font-weight:bold;font-size:1.1em;margin-bottom:8px;">פעילות זו מקודזת מיתרת הבנק — ללא תשלום נוסף.</div>
+            <div style="font-weight:bold;font-size:1.1em;margin-bottom:8px;">פעילות זו מקוזזת מיתרת הבנק — ללא תשלום נוסף.</div>
             <div id="bankDeductionDetails" style="font-size:0.95em;color:#555;"></div>
           </div>
         </div>
@@ -847,6 +847,11 @@
       document.querySelector("th.col-bruto").style.display = "none";
     }
 
+    // Hide quantity column header for summary quotes
+    if (isSummary) {
+      document.querySelector("th.col-qty").style.display = "none";
+    }
+
     // Check if this is a hybrid quote (has both bank and non-bank items)
     const bankItems = (data.items || []).filter(i => i.is_bank_deduction);
     const billableItems = (data.items || []).filter(i => !i.is_bank_deduction);
@@ -886,7 +891,7 @@
         var bi = data.bank_info;
         var noticeRow = document.createElement("tr");
         noticeRow.innerHTML = '<td colspan="' + fullColSpan + '" style="padding:16px 8px;"><div style="background:#FFF8E1;border:1px solid #FFD54F;border-radius:8px;padding:16px;text-align:center;">' +
-          '<div style="font-weight:bold;font-size:1.1em;margin-bottom:8px;">פעילות זו מקודזת מיתרת הבנק — ללא תשלום נוסף.</div>' +
+          '<div style="font-weight:bold;font-size:1.1em;margin-bottom:8px;">פעילות זו מקוזזת מיתרת הבנק — ללא תשלום נוסף.</div>' +
           '<div style="font-size:0.95em;color:#555;">סכום בנק מקורי: <strong>\u20AA' + (bi.original_amount || 0).toLocaleString() + '</strong><br>' +
           'מומש עד כה: <strong>\u20AA' + (bi.used || bi.used_amount || 0).toLocaleString() + '</strong><br>' +
           'יתרה לאחר פעילות זו: <strong>\u20AA' + (bi.balance || bi.remaining || 0).toLocaleString() + '</strong></div></div></td>';
@@ -923,7 +928,7 @@
       summaryRow.innerHTML =
         '<td class="col-num">1</td>' +
         "<td>" + (data.subject || "") + "</td>" +
-        '<td class="col-qty"></td>' +
+        '<td class="col-qty" style="display:none"></td>' +
         '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto && totalBruto !== total ? "\u20AA" + totalBruto.toLocaleString() : "") + "</td>" +
         '<td class="col-neto">\u20AA' + total.toLocaleString() + "</td>";
       tbody.appendChild(summaryRow);
