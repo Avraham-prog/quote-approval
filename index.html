@@ -634,7 +634,7 @@
               <th class="col-qty">כמות</th>
               <th class="col-bruto">מחיר ברוטו</th>
               <th class="col-commission">עמלה %</th>
-              <th class="col-dmm">דמ"מ %</th>
+              <th class="col-dmm">דמ"ט %</th>
               <th class="col-neto">מחיר נטו</th>
             </tr>
           </thead>
@@ -881,10 +881,12 @@
       const neto = item.price || item.neto || 0;
       const bruto = item.bruto || item.original_price || neto;
       const commPct = item.commission_pct || item.client_commission_pct || 0;
-      // Split: commission (discount, net < bruto) vs dmm (markup, net > bruto)
-      const isMarkup = neto > bruto;
-      const commDisplay = showCommission && commPct && !isMarkup ? commPct + "%" : "";
-      const dmmDisplay = showCommission && commPct && isMarkup ? "+" + commPct + "%" : "";
+      const termType = item.term_type || "fee_only";
+      // fee_only → עמלה column, fee_and_media → דמ"ט column, fee_refund → דמ"ט column with minus
+      const isFeeOnly = termType === "fee_only";
+      const isFeeRefund = termType === "fee_refund";
+      const commDisplay = showCommission && commPct && isFeeOnly ? commPct + "%" : "";
+      const dmmDisplay = showCommission && commPct && !isFeeOnly ? (isFeeRefund ? "- " + commPct + "%" : commPct + "%") : "";
       const tr = document.createElement("tr");
       tr.innerHTML =
         '<td class="col-num">' + (idx + 1) + "</td>" +
