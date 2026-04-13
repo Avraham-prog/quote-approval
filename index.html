@@ -886,7 +886,7 @@
       const isFeeOnly = termType === "fee_only";
       const isFeeRefund = termType === "fee_refund";
       const dmmDisplay = showCommission && commPct && isFeeOnly ? commPct + "%" : "";
-      const commDisplay = showCommission && commPct && !isFeeOnly ? (isFeeRefund ? "- " + commPct + "%" : commPct + "%") : "";
+      const commDisplay = showCommission && commPct && !isFeeOnly ? (isFeeRefund ? "\u200F-" + commPct + "%" : commPct + "%") : "";
       const tr = document.createElement("tr");
       tr.innerHTML =
         '<td class="col-num">' + (idx + 1) + "</td>" +
