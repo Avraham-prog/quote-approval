@@ -224,7 +224,16 @@
 
   .items-table tbody td.col-bruto {
     color: #94a3b8;
+  }
+
+  .items-table tbody td.col-bruto.strikethrough {
     text-decoration: line-through;
+  }
+
+  .items-table thead th.col-commission,
+  .items-table tbody td.col-commission {
+    text-align: center;
+    width: 70px;
   }
 
   .items-table tbody tr:last-child td {
@@ -621,8 +630,9 @@
               <th class="col-num">#</th>
               <th>תיאור</th>
               <th class="col-qty">כמות</th>
-              <th class="col-bruto">ברוטו</th>
-              <th class="col-neto">נטו</th>
+              <th class="col-bruto">מחיר ברוטו</th>
+              <th class="col-commission">עמלה %</th>
+              <th class="col-neto">מחיר נטו</th>
             </tr>
           </thead>
           <tbody id="itemsBody">
@@ -847,6 +857,12 @@
       document.querySelector("th.col-bruto").style.display = "none";
     }
 
+    // Show commission column only for detailed_gross_net
+    const showCommission = qt === "detailed_gross_net";
+    if (!showCommission) {
+      document.querySelector("th.col-commission").style.display = "none";
+    }
+
     // Hide quantity column header for summary quotes
     if (isSummary) {
       document.querySelector("th.col-qty").style.display = "none";
@@ -860,12 +876,14 @@
     function renderItemRow(item, idx) {
       const neto = item.price || item.neto || 0;
       const bruto = item.bruto || item.original_price || neto;
+      const commPct = item.commission_pct || item.client_commission_pct || 0;
       const tr = document.createElement("tr");
       tr.innerHTML =
         '<td class="col-num">' + (idx + 1) + "</td>" +
         "<td>" + (item.vendor_name && item.description ? item.vendor_name + " \u2013 " + item.description : (item.description || item.vendor_name || "")) + "</td>" +
         '<td class="col-qty">' + (item.activity_type && item.activity_type.startsWith("\u05de\u05d7\u05d9\u05e8\u05d5\u05e0\u05d9\u05dd") ? (item.quantity || 1) : "") + "</td>" +
-        '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto && bruto !== neto ? "\u20AA" + bruto.toLocaleString() : "") + "</td>" +
+        '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto ? "\u20AA" + bruto.toLocaleString() : "") + "</td>" +
+        '<td class="col-commission"' + (!showCommission ? ' style="display:none"' : '') + '>' + (showCommission && commPct ? commPct + "%" : "") + "</td>" +
         '<td class="col-neto">\u20AA' + neto.toLocaleString() + "</td>";
       return tr;
     }
@@ -879,9 +897,14 @@
         tbody.appendChild(renderItemRow(item, idx));
       });
 
-      // Bank subtotal row
-      var fullColSpan = showBruto ? 5 : 4;
-      var colSpan = showBruto ? 4 : 3;
+      // Bank subtotal row - count visible columns
+      var visibleCols = 3; // #, desc, neto always visible
+      if (showBruto) visibleCols++;
+      if (showCommission) visibleCols++;
+      var qtyVisible = true; // qty visible in non-summary
+      if (qtyVisible) visibleCols++;
+      var fullColSpan = visibleCols;
+      var colSpan = visibleCols - 1;
       var bankSubRow = document.createElement("tr");
       bankSubRow.innerHTML = '<td colspan="' + colSpan + '" style="text-align:right;font-weight:bold;border-top:2px solid #333;">סה"כ לפני מע"מ</td><td class="col-neto" style="font-weight:bold;border-top:2px solid #333;">\u20AA' + bankTotal.toLocaleString() + '</td>';
       tbody.appendChild(bankSubRow);
@@ -930,6 +953,7 @@
         "<td>" + (data.subject || "") + "</td>" +
         '<td class="col-qty" style="display:none"></td>' +
         '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto && totalBruto !== total ? "\u20AA" + totalBruto.toLocaleString() : "") + "</td>" +
+        '<td class="col-commission" style="display:none"></td>' +
         '<td class="col-neto">\u20AA' + total.toLocaleString() + "</td>";
       tbody.appendChild(summaryRow);
       document.getElementById("totalAmount").textContent = "\u20AA" + total.toLocaleString();
