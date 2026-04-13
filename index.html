@@ -882,11 +882,11 @@
       const bruto = item.bruto || item.original_price || neto;
       const commPct = item.commission_pct || item.client_commission_pct || 0;
       const termType = item.term_type || "fee_only";
-      // fee_only → עמלה column, fee_and_media → דמ"ט column, fee_refund → דמ"ט column with minus
+      // fee_only (דמ"ט בלבד) → דמ"ט column; rest → עמלה column
       const isFeeOnly = termType === "fee_only";
       const isFeeRefund = termType === "fee_refund";
-      const commDisplay = showCommission && commPct && isFeeOnly ? commPct + "%" : "";
-      const dmmDisplay = showCommission && commPct && !isFeeOnly ? (isFeeRefund ? "- " + commPct + "%" : commPct + "%") : "";
+      const dmmDisplay = showCommission && commPct && isFeeOnly ? commPct + "%" : "";
+      const commDisplay = showCommission && commPct && !isFeeOnly ? (isFeeRefund ? "- " + commPct + "%" : commPct + "%") : "";
       const tr = document.createElement("tr");
       tr.innerHTML =
         '<td class="col-num">' + (idx + 1) + "</td>" +
