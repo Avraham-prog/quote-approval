@@ -763,6 +763,8 @@
   // ══════════════════════════════════════════
   // Render Quote Data
   // ══════════════════════════════════════════
+  function fmt(n) { return Math.round(n).toLocaleString(); }
+
   function renderQuote(data) {
     // Subtitle: "Q-00011 — פסח 2026"
     const subtitle = document.getElementById("quoteSubtitle");
@@ -825,9 +827,9 @@
       document.getElementById("bankDeductionSection").style.display = "block";
       var bi = data.bank_info;
       document.getElementById("bankDeductionDetails").innerHTML =
-        "סכום בנק מקורי: <strong>\u20AA" + (bi.original_amount || 0).toLocaleString() + "</strong> | " +
-        "מומש עד כה: <strong>\u20AA" + (bi.used || bi.used_amount || 0).toLocaleString() + "</strong> | " +
-        "יתרה לאחר פעילות זו: <strong>\u20AA" + (bi.balance || bi.remaining || 0).toLocaleString() + "</strong>";
+        "סכום בנק מקורי: <strong>\u20AA" + fmt(bi.original_amount || 0) + "</strong> | " +
+        "מומש עד כה: <strong>\u20AA" + fmt(bi.used || bi.used_amount || 0) + "</strong> | " +
+        "יתרה לאחר פעילות זו: <strong>\u20AA" + fmt(bi.balance || bi.remaining || 0) + "</strong>";
     } else if (data.bank_info && isHybridQuote) {
       // Hybrid quote: bank deduction notice shown inline (handled in items table rendering above)
       // Keep payment terms and bank transfer visible for the billable portion
@@ -886,16 +888,16 @@
       const isFeeOnly = termType === "fee_only";
       const isFeeRefund = termType === "fee_refund";
       const dmmDisplay = showCommission && commPct && isFeeOnly ? commPct + "%" : "";
-      const commDisplay = showCommission && commPct && !isFeeOnly ? (isFeeRefund ? "\u200F-" + commPct + "%" : commPct + "%") : "";
+      const commDisplay = showCommission && commPct && !isFeeOnly ? (isFeeRefund ? commPct + "% -" : commPct + "%") : "";
       const tr = document.createElement("tr");
       tr.innerHTML =
         '<td class="col-num">' + (idx + 1) + "</td>" +
         "<td>" + (item.vendor_name && item.description ? item.vendor_name + " \u2013 " + item.description : (item.description || item.vendor_name || "")) + "</td>" +
         '<td class="col-qty">' + (item.activity_type && item.activity_type.startsWith("\u05de\u05d7\u05d9\u05e8\u05d5\u05e0\u05d9\u05dd") ? (item.quantity || 1) : "") + "</td>" +
-        '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto ? "\u20AA" + bruto.toLocaleString() : "") + "</td>" +
+        '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto ? "\u20AA" + fmt(bruto) : "") + "</td>" +
         '<td class="col-commission"' + (!showCommission ? ' style="display:none"' : '') + '>' + commDisplay + "</td>" +
         '<td class="col-dmm"' + (!showCommission ? ' style="display:none"' : '') + '>' + dmmDisplay + "</td>" +
-        '<td class="col-neto">\u20AA' + neto.toLocaleString() + "</td>";
+        '<td class="col-neto">\u20AA' + fmt(neto) + "</td>";
       return tr;
     }
 
@@ -917,7 +919,7 @@
       var fullColSpan = visibleCols;
       var colSpan = visibleCols - 1;
       var bankSubRow = document.createElement("tr");
-      bankSubRow.innerHTML = '<td colspan="' + colSpan + '" style="text-align:right;font-weight:bold;border-top:2px solid #333;">סה"כ לפני מע"מ</td><td class="col-neto" style="font-weight:bold;border-top:2px solid #333;">\u20AA' + bankTotal.toLocaleString() + '</td>';
+      bankSubRow.innerHTML = '<td colspan="' + colSpan + '" style="text-align:right;font-weight:bold;border-top:2px solid #333;">סה"כ לפני מע"מ</td><td class="col-neto" style="font-weight:bold;border-top:2px solid #333;">\u20AA' + fmt(bankTotal) + '</td>';
       tbody.appendChild(bankSubRow);
 
       // 2. Bank deduction notice as table row
@@ -926,9 +928,9 @@
         var noticeRow = document.createElement("tr");
         noticeRow.innerHTML = '<td colspan="' + fullColSpan + '" style="padding:16px 8px;"><div style="background:#FFF8E1;border:1px solid #FFD54F;border-radius:8px;padding:16px;text-align:center;">' +
           '<div style="font-weight:bold;font-size:1.1em;margin-bottom:8px;">פעילות זו מקוזזת מיתרת הבנק — ללא תשלום נוסף.</div>' +
-          '<div style="font-size:0.95em;color:#555;">סכום בנק מקורי: <strong>\u20AA' + (bi.original_amount || 0).toLocaleString() + '</strong><br>' +
-          'מומש עד כה: <strong>\u20AA' + (bi.used || bi.used_amount || 0).toLocaleString() + '</strong><br>' +
-          'יתרה לאחר פעילות זו: <strong>\u20AA' + (bi.balance || bi.remaining || 0).toLocaleString() + '</strong></div></div></td>';
+          '<div style="font-size:0.95em;color:#555;">סכום בנק מקורי: <strong>\u20AA' + fmt(bi.original_amount || 0) + '</strong><br>' +
+          'מומש עד כה: <strong>\u20AA' + fmt(bi.used || bi.used_amount || 0) + '</strong><br>' +
+          'יתרה לאחר פעילות זו: <strong>\u20AA' + fmt(bi.balance || bi.remaining || 0) + '</strong></div></div></td>';
         tbody.appendChild(noticeRow);
       }
 
@@ -945,7 +947,7 @@
       });
 
       // Show billable total only
-      document.getElementById("totalAmount").textContent = "\u20AA" + billableTotal.toLocaleString();
+      document.getElementById("totalAmount").textContent = "\u20AA" + fmt(billableTotal);
       // Hide static bank deduction section
       document.getElementById("bankDeductionSection").style.display = "none";
     } else if (isSummary) {
@@ -963,12 +965,12 @@
         '<td class="col-num">1</td>' +
         "<td>" + (data.subject || "") + "</td>" +
         '<td class="col-qty" style="display:none"></td>' +
-        '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto && totalBruto !== total ? "\u20AA" + totalBruto.toLocaleString() : "") + "</td>" +
+        '<td class="col-bruto"' + (!showBruto ? ' style="display:none"' : '') + '>' + (showBruto && totalBruto !== total ? "\u20AA" + fmt(totalBruto) : "") + "</td>" +
         '<td class="col-commission" style="display:none"></td>' +
         '<td class="col-dmm" style="display:none"></td>' +
-        '<td class="col-neto">\u20AA' + total.toLocaleString() + "</td>";
+        '<td class="col-neto">\u20AA' + fmt(total) + "</td>";
       tbody.appendChild(summaryRow);
-      document.getElementById("totalAmount").textContent = "\u20AA" + total.toLocaleString();
+      document.getElementById("totalAmount").textContent = "\u20AA" + fmt(total);
     } else {
       // DETAILED QUOTE: all items in one table
       let total = 0;
@@ -978,7 +980,7 @@
           tbody.appendChild(renderItemRow(item, idx));
         });
       }
-      document.getElementById("totalAmount").textContent = "\u20AA" + total.toLocaleString();
+      document.getElementById("totalAmount").textContent = "\u20AA" + fmt(total);
     }
 
     // Status
