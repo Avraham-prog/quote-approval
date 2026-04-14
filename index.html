@@ -22,6 +22,25 @@
     padding: 32px 16px 60px;
   }
 
+  .table-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 640px) {
+    .page-wrapper { padding: 16px 8px 40px; }
+    .items-table { font-size: 0.78rem; min-width: 540px; }
+    .items-table thead th { padding: 8px 6px; font-size: 0.72rem; }
+    .items-table tbody td { padding: 8px 6px; }
+    .items-table thead th.col-num { width: 28px; }
+    .items-table thead th.col-qty { width: 42px; }
+    .items-table thead th.col-bruto,
+    .items-table thead th.col-neto { width: 85px; }
+    .items-table thead th.col-commission,
+    .items-table thead th.col-dmm { width: 55px; }
+  }
+
   /* ── Loading & Error States ── */
   .loading-state {
     text-align: center;
@@ -625,6 +644,9 @@
           בהמשך לשיחתנו, להלן הצעת המחיר לביצוע העבודה כמפורט מטה.
         </div>
 
+        <!-- Items Table wrapper (scrollable on mobile) -->
+        <div class="table-scroll-wrapper">
+
         <!-- Items Table -->
         <table class="items-table">
           <thead>
@@ -642,6 +664,7 @@
             <!-- Populated by JS -->
           </tbody>
         </table>
+        </div>
 
         <!-- Total -->
         <div class="total-row">
@@ -785,7 +808,12 @@
 
     // Intro text
     if (data.intro_text) {
-      document.getElementById("introText").textContent = data.intro_text;
+      var introText = data.intro_text
+        .replace(/\{\{contact_name\}\}/g, data.contact_name || "")
+        .replace(/\{\{customer_name\}\}/g, data.customer_name || "")
+        .replace(/\{\{rep_name\}\}/g, data.sender_name || "")
+        .replace(/\{\{sender_name\}\}/g, data.sender_name || "");
+      document.getElementById("introText").textContent = introText;
     }
 
     // Payment terms
