@@ -884,11 +884,24 @@
       const bruto = item.bruto || item.original_price || neto;
       const commPct = item.commission_pct || item.client_commission_pct || 0;
       const termType = item.term_type || "fee_only";
-      // fee_only (דמ"ט בלבד) → דמ"ט column; rest → עמלה column
+      const isPriceList = item.activity_type && item.activity_type.startsWith("\u05de\u05d7\u05d9\u05e8\u05d5\u05e0\u05d9\u05dd");
       const isFeeOnly = termType === "fee_only";
       const isFeeRefund = termType === "fee_refund";
-      const dmmDisplay = showCommission && commPct && isFeeOnly ? commPct + "%" : "";
-      const commDisplay = showCommission && commPct && !isFeeOnly ? (isFeeRefund ? commPct + "% -" : commPct + "%") : "";
+      let commDisplay = "";
+      let dmmDisplay = "";
+      if (showCommission) {
+        if (isPriceList && bruto > neto) {
+          // Price list with discount: calculate % from bruto/net, show in עמלה column with minus
+          const discountPct = Math.round((bruto - neto) / bruto * 100);
+          commDisplay = discountPct + "% -";
+        } else if (commPct) {
+          if (isFeeOnly) {
+            dmmDisplay = commPct + "%";
+          } else {
+            commDisplay = isFeeRefund ? commPct + "% -" : commPct + "%";
+          }
+        }
+      }
       const tr = document.createElement("tr");
       tr.innerHTML =
         '<td class="col-num">' + (idx + 1) + "</td>" +
