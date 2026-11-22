@@ -751,7 +751,7 @@
   // ══════════════════════════════════════════
   // API Configuration — BASE44 Integration
   // ══════════════════════════════════════════
-  const API_BASE = "https://avraham-ap-flow.base44.app/functions";
+  const API_BASE = "https://orbit-system.base44.app/functions";
 
   // Extract token from URL
   function getToken() {
@@ -788,6 +788,84 @@
   // ══════════════════════════════════════════
   function fmt(n) { return Math.round(n).toLocaleString(); }
 
+  const HE_DAYS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+  const PAYMENT_TERMS_LABELS = {
+    current: "שוטף",
+    current_15: "שוטף + 15",
+    current_30: "שוטף + 30",
+    current_45: "שוטף + 45",
+    current_60: "שוטף + 60",
+    current_75: "שוטף + 75",
+    current_90: "שוטף + 90",
+    immediate: "מיידי",
+    prepaid: "תשלום מראש",
+    eom: "סוף חודש",
+    eom_30: "סוף חודש + 30",
+    eom_60: "סוף חודש + 60",
+  };
+  // No regex lookbehind: it throws on older Safari and would break the whole page.
+  const PAYMENT_TERMS_RE = new RegExp(
+    "(^|[^a-zA-Z_])(" +
+      Object.keys(PAYMENT_TERMS_LABELS).sort((a, b) => b.length - a.length).join("|") +
+      ")(?![a-zA-Z_0-9])",
+    "g"
+  );
+
+  // Date-only values are read at local noon so a customer abroad never sees the previous day.
+  function parseQuoteDate(value) {
+    if (!value) return null;
+    const date = new Date(String(value).slice(0, 10) + "T12:00:00");
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  function fmtHeDate(value) {
+    const date = parseQuoteDate(value);
+    return date ? date.toLocaleDateString("he-IL") : "";
+  }
+
+  function buildAirDatesText(start, end) {
+    const startDate = parseQuoteDate(start);
+    if (!startDate) return "";
+    const startText = fmtHeDate(start) + " יום " + HE_DAYS[startDate.getDay()];
+    const endDate = parseQuoteDate(end);
+    if (!endDate || String(end).slice(0, 10) === String(start).slice(0, 10)) {
+      return "בתאריך " + startText;
+    }
+    return "מתאריך " + startText + " ועד תאריך " + fmtHeDate(end) + " יום " + HE_DAYS[endDate.getDay()];
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, ch => (
+      { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]
+    ));
+  }
+
+  // Mirrors the variables offered by Orbit's quote editor (VariableInsertPopover).
+  function resolveTemplate(text, data, escapeValues) {
+    const customerTerms = data.customer_payment_terms || "";
+    const vars = {
+      customer_name: data.customer_name,
+      contact_name: data.contact_name,
+      contact_phone: data.contact_phone,
+      quote_date: fmtHeDate(data.date),
+      air_dates: buildAirDatesText(data.air_date_start, data.air_date_end),
+      title: data.subject,
+      quote_number: data.quote_number,
+      employee_name: data.sender_name,
+      rep_name: data.sender_name,
+      sender_name: data.sender_name,
+      valid_until: fmtHeDate(data.valid_until),
+      payment_terms: PAYMENT_TERMS_LABELS[customerTerms] || customerTerms,
+    };
+    return String(text || "")
+      .replace(/\{\{(\w+)\}\}/g, (match, key) => {
+        if (!Object.prototype.hasOwnProperty.call(vars, key)) return match;
+        const value = String(vars[key] || "");
+        return escapeValues ? escapeHtml(value) : value;
+      })
+      .replace(PAYMENT_TERMS_RE, (match, prefix, code) => prefix + PAYMENT_TERMS_LABELS[code]);
+  }
+
   function renderQuote(data) {
     // Subtitle: "Q-00011 — פסח 2026"
     const subtitle = document.getElementById("quoteSubtitle");
@@ -808,33 +886,15 @@
 
     // Intro text
     if (data.intro_text) {
-      var introText = data.intro_text
-        .replace(/\{\{contact_name\}\}/g, data.contact_name || "")
-        .replace(/\{\{customer_name\}\}/g, data.customer_name || "")
-        .replace(/\{\{rep_name\}\}/g, data.sender_name || "")
-        .replace(/\{\{sender_name\}\}/g, data.sender_name || "");
-      document.getElementById("introText").textContent = introText;
+      document.getElementById("introText").textContent = resolveTemplate(data.intro_text, data, false);
     }
 
     // Payment terms
     const payTerms = document.getElementById("paymentTermsText");
     var rawTerms = data.payment_terms || data.payment_terms_text || "";
     if (rawTerms) {
-      const paymentTermsMap = {
-        "current_30": "שוטף + 30",
-        "current_45": "שוטף + 45",
-        "current_60": "שוטף + 60",
-        "current_90": "שוטף + 90",
-        "immediate": "מיידי",
-        "prepaid": "תשלום מראש",
-        "eom": "סוף חודש",
-        "eom_30": "סוף חודש + 30",
-        "eom_60": "סוף חודש + 60",
-      };
-      let termsText = rawTerms;
-      Object.keys(paymentTermsMap).forEach(key => {
-        termsText = termsText.replace(new RegExp(key, 'g'), paymentTermsMap[key]);
-      });
+      // Values are escaped because this text is rendered through innerHTML below.
+      const termsText = resolveTemplate(rawTerms, data, true);
       // If payment_terms_text already contains full sentence, use as-is; otherwise wrap
       if (termsText.includes("תנאי התשלום")) {
         payTerms.innerHTML = termsText.replace(/\n/g, "<br>");
